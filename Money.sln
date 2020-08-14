@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money", "Money\Money.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Data", "Money.Data\Money.Data.csproj", "{074E8DC7-7F85-4257-9E4C-F375CD1B8FC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Importers", "Money.Importers\Money.Importers.csproj", "{F4290864-A1DA-4F96-BEED-07BA943C5D86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{074E8DC7-7F85-4257-9E4C-F375CD1B8FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{074E8DC7-7F85-4257-9E4C-F375CD1B8FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{074E8DC7-7F85-4257-9E4C-F375CD1B8FC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4290864-A1DA-4F96-BEED-07BA943C5D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4290864-A1DA-4F96-BEED-07BA943C5D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4290864-A1DA-4F96-BEED-07BA943C5D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4290864-A1DA-4F96-BEED-07BA943C5D86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
