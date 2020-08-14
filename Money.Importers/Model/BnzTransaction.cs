@@ -2,6 +2,7 @@
 using Money.Data.Model;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Money.Importers.Model
@@ -48,7 +49,19 @@ namespace Money.Importers.Model
                 Reference = Reference,
                 Serial = Serial,
                 TransactionDate = Date,
+                ExternalId = GetExternalId(),
             };
+        }
+
+        private readonly static SHA256Managed sha = new SHA256Managed();
+
+        private string GetExternalId()
+        {
+            var raw = $"{Date:yyyy-MM-dd}:{Serial}:{ProcessedDate:yyyy-MM-dd}:{Amount:0.00}";
+            var rawData = Encoding.UTF8.GetBytes(raw);
+            var signature = sha.ComputeHash(rawData);
+            var signatureString = Convert.ToBase64String(signature);
+            return signatureString;
         }
     }
 }

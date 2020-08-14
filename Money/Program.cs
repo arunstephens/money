@@ -14,7 +14,7 @@ namespace Money
 
             await foreach (var tx in importer.Import(@"C:\Users\a\Documents\Money\Joint---Main-9AUG2018-to-9AUG2020.csv"))
             {
-                Console.WriteLine(tx.TransactionDate + " " + tx.Amount);
+                Console.WriteLine(tx.TransactionDate + " " + tx.Amount + " " + tx.ExternalId);
             }
         }
     }
