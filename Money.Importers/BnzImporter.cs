@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Money.Importers
 {
-    public class BnzImporter
+    public class BnzImporter : IImporter
     {
         public async IAsyncEnumerable<Transaction> Import(string filename)
         {

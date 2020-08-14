@@ -28,6 +28,8 @@ namespace Money.Data.Model
         public string BankBatchNumber { get; set; }
         public string OriginatingBankBranch { get; set; }
 
+        public string CardSuffix { get; set; }
+
         //public virtual Account Account { get; set; }
     }
 }
