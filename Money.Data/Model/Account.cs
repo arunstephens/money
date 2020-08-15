@@ -10,6 +10,8 @@ namespace Money.Data.Model
         public string Name { get; set; }
         public string Number { get; set; }
 
+        public decimal OpeningBalance { get; set; }
+
         public IList<Transaction> Transactions { get; set; }
     }
 }

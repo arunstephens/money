@@ -30,6 +30,6 @@ namespace Money.Data.Model
 
         public string CardSuffix { get; set; }
 
-        //public virtual Account Account { get; set; }
+        public virtual Account Account { get; set; }
     }
 }
