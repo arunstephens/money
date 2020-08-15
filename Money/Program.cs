@@ -24,7 +24,14 @@ namespace Money
                 Console.WriteLine(tx.TransactionDate + " " + tx.Amount + " " + tx.ExternalId);
             }
 
-            
+            importer = new CsvImporter<Importers.Model.KiwibankBankTransaction>(true, false);
+
+            await foreach (var tx in importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-02_10Aug.CSV"))
+            {
+                Console.WriteLine(tx.TransactionDate + " " + tx.Amount + " " + tx.ExternalId);
+            }
+
+
         }
     }
 }
