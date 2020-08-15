@@ -8,7 +8,7 @@ namespace Money.Data.Model
         public int Id { get; set; }
         public string ExternalId { get; set; }
         public int AccountId { get; set; }
-        //public int? PayeeId { get; set; }
+        public Payee Payee { get; set; }
         //public int? CategoryId { get; set; }
 
         public DateTime TransactionDate { get; set; }

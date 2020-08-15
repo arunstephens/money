@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Money.Data;
 
 namespace Money.Data.Migrations
 {
     [DbContext(typeof(MoneyContext))]
-    partial class MoneyContextModelSnapshot : ModelSnapshot
+    [Migration("20200815225627_Transaction_Payee")]
+    partial class Transaction_Payee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,26 +55,6 @@ namespace Money.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Payee");
-                });
-
-            modelBuilder.Entity("Money.Data.Model.PayeeAlternateName", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PayeeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PayeeId");
-
-                    b.ToTable("PayeeAlternateName");
                 });
 
             modelBuilder.Entity("Money.Data.Model.Transaction", b =>
@@ -143,13 +125,6 @@ namespace Money.Data.Migrations
                     b.HasIndex("PayeeId");
 
                     b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("Money.Data.Model.PayeeAlternateName", b =>
-                {
-                    b.HasOne("Money.Data.Model.Payee", null)
-                        .WithMany("AlternateNames")
-                        .HasForeignKey("PayeeId");
                 });
 
             modelBuilder.Entity("Money.Data.Model.Transaction", b =>
