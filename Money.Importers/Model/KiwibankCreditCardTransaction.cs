@@ -31,15 +31,9 @@ namespace Money.Importers.Model
             };
         }
 
-        private readonly static SHA256Managed sha = new SHA256Managed();
-
         private string GetExternalId()
         {
-            var raw = $"{Date:yyyy-MM-dd}:{Payee}:{CardSuffix}:{Amount:0.00}";
-            var rawData = Encoding.UTF8.GetBytes(raw);
-            var signature = sha.ComputeHash(rawData);
-            var signatureString = Convert.ToBase64String(signature);
-            return signatureString;
+            return ModelHelper.GetSignature($"{Date:yyyy-MM-dd}:{Payee}:{CardSuffix}:{Amount:0.00}");
         }
     }
 }

@@ -13,32 +13,45 @@ namespace Money.Importers
     {
         private bool _hasHeaderRow = true;
         private bool _skipFirstRow = false;
+        private bool _waitForEmptyLine = false;
 
-        public CsvImporter(bool hasHeaderRow, bool skipFirstRow)
+        public CsvImporter(bool hasHeaderRow = true, bool skipFirstRow = false, bool waitForEmptyLine = false)
         {
             _hasHeaderRow = hasHeaderRow;
             _skipFirstRow = skipFirstRow;
+            _waitForEmptyLine = waitForEmptyLine;
         }
 
         public async IAsyncEnumerable<Transaction> Import(string filename)
         {
             using (var reader = new StreamReader(filename))
-            using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                csv.Configuration.HasHeaderRecord = _hasHeaderRow;
-
-                if (_skipFirstRow)
+                if (_waitForEmptyLine)
                 {
-                    await csv.ReadAsync();
+                    string line = null;
+                    while (line != string.Empty)
+                    {
+                        line = await reader.ReadLineAsync();
+                    }
                 }
 
-                T placeholder = new T();
-
-                await foreach (var bankTx in csv.EnumerateRecordsAsync<T>(placeholder))
+                using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
                 {
-                    var tx = bankTx.ToTransaction();
+                    csv.Configuration.HasHeaderRecord = _hasHeaderRow;
 
-                    yield return tx;
+                    if (_skipFirstRow)
+                    {
+                        await csv.ReadAsync();
+                    }
+
+                    T placeholder = new T();
+
+                    await foreach (var bankTx in csv.EnumerateRecordsAsync<T>(placeholder))
+                    {
+                        var tx = bankTx.ToTransaction();
+
+                        yield return tx;
+                    }
                 }
             }
         }

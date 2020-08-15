@@ -64,15 +64,10 @@ namespace Money.Importers.Model
             };
         }
 
-        private readonly static SHA256Managed sha = new SHA256Managed();
-
         private string GetExternalId()
         {
             var raw = $"{Date:yyyy-MM-dd}:{Memo}:{Amount:0.00}:{Balance:0.00}";
-            var rawData = Encoding.UTF8.GetBytes(raw);
-            var signature = sha.ComputeHash(rawData);
-            var signatureString = Convert.ToBase64String(signature);
-            return signatureString;
+            return ModelHelper.GetSignature(raw);
         }
     }
 }
