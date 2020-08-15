@@ -12,7 +12,7 @@ namespace Money.Data.Model
         //public int? CategoryId { get; set; }
 
         public DateTime TransactionDate { get; set; }
-        public DateTime ProcessedDate { get; set; }
+        public DateTime? ProcessedDate { get; set; }
 
         public string PayeeName { get; set; }
         public decimal Amount { get; set; }
