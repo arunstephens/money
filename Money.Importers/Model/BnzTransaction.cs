@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Money.Importers.Model
 {
-    public class BnzTransaction
+    public class BnzTransaction : IBankTransaction
     {
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }

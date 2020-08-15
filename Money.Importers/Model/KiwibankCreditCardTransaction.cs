@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Money.Importers.Model
 {
-    public class KiwibankCreditCardTransaction
+    public class KiwibankCreditCardTransaction : IBankTransaction
     {
         [Index(0)]
         [Format("dd-MM-yyyy")]
