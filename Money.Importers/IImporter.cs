@@ -7,6 +7,6 @@ namespace Money.Importers
 {
     public interface IImporter
     {
-        IAsyncEnumerable<Transaction> Import(string filename);
+        IAsyncEnumerable<Transaction> Import(string filename, Func<string, int> accountIdMapper);
     }
 }

@@ -22,7 +22,7 @@ namespace Money.Importers
             _waitForEmptyLine = waitForEmptyLine;
         }
 
-        public async IAsyncEnumerable<Transaction> Import(string filename)
+        public async IAsyncEnumerable<Transaction> Import(string filename, Func<string, int> accountIdMapper)
         {
             using (var reader = new StreamReader(filename))
             {
@@ -49,6 +49,8 @@ namespace Money.Importers
                     await foreach (var bankTx in csv.EnumerateRecordsAsync<T>(placeholder))
                     {
                         var tx = bankTx.ToTransaction();
+
+                        tx.AccountId = accountIdMapper(null);
 
                         yield return tx;
                     }
