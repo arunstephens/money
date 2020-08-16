@@ -43,8 +43,6 @@ namespace Money.Importers.Model
             };
         }
 
-        private readonly static SHA256Managed sha = new SHA256Managed();
-
         private string GetExternalId()
         {
             return ModelHelper.GetSignature(UniqueId);

@@ -1,8 +1,11 @@
-﻿using Money.Data;
+﻿using Dapper;
+using Dapper.Contrib.Extensions;
+using Money.Data;
 using Money.Data.Model;
 using Money.Importers;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +14,7 @@ namespace Money
 {
     class Program
     {
-        static MoneyContext _context = new MoneyContext();
+        const string ConnectionString = @"Server=.\SQLEXPRESS;Trusted_Connection=True;MultipleActiveResultSets=true;Database=MoneyDB";
 
         static async Task Main(string[] args)
         {
@@ -48,6 +51,11 @@ namespace Money
             await AssignPayees();
         }
 
+        private static SqlConnection GetConnection()
+        {
+            return new SqlConnection(ConnectionString);
+        }
+
         private static async Task WriteTransactions(IAsyncEnumerable<Transaction> transactions)
         {
             await foreach (var tx in transactions)
@@ -56,11 +64,26 @@ namespace Money
             }
         }
 
+        private static async Task<Transaction> GetTransaction(int accountId, string externalId)
+        {
+            using var connection = GetConnection();
+
+            return await connection.QueryFirstAsync<Transaction>("SELECT * FROM Transactions WHERE AccountId = @accountId AND ExternalId = @externalId",
+                new { accountId, externalId });
+        }
+
+        private static async Task InsertTransaction(Transaction tx)
+        {
+            using var connection = GetConnection();
+
+            await connection.InsertAsync(tx);
+        }
+
         private static async Task InsertOrUpdateTransactions(IAsyncEnumerable<Transaction> transactions)
         {
             await foreach (var tx in transactions)
             {
-                var savedTx = await _context.Transactions.SingleOrDefaultAsync(t => t.Account.Id == tx.Account.Id && t.ExternalId == tx.ExternalId);
+                var savedTx = await GetTransaction(tx.Account.Id, tx.ExternalId);
 
                 if (savedTx != null)
                 {
@@ -68,16 +91,43 @@ namespace Money
                 }
                 else
                 {
-                    await _context.AddAsync(tx);
+                    await InsertTransaction(tx);
                 }
             }
-
-            _context.SaveChanges();
         }
 
         private static string PadOrTruncate(string value, int maxLength)
         {
             return (value.Length < maxLength ? value : value.Substring(0, maxLength)).PadRight(maxLength);
+        }
+
+        private static async Task<Account> GetAccount(string accountNumber)
+        {
+            using var connection = GetConnection();
+
+            return await connection.QueryFirstAsync<Account>("SELECCT * FROM Accounts WHERE Number = @accountNumber",
+                new { accountNumber });
+        }
+
+        private static async Task InsertAccount(Account account)
+        {
+            using var connection = GetConnection();
+
+            await connection.InsertAsync(account);
+        }
+
+        private static async Task UpdateAccount(Account account)
+        {
+            using var connection = GetConnection();
+
+            await connection.UpdateAsync(account);
+        }
+
+        private static async Task<IEnumerable<Account>> GetAccounts()
+        {
+            using var connection = GetConnection();
+
+            return await connection.GetAllAsync<Account>();
         }
 
         private static async Task<IEnumerable<Account>> GetOrCreateAccounts()
@@ -87,77 +137,119 @@ namespace Money
 
             await foreach (var account in accounts)
             {
-                var savedAccount = _context.Accounts.SingleOrDefault(a => a.Number == account.Number);
+                var savedAccount = await GetAccount(account.Number);
 
                 if (savedAccount == null)
                 {
-                    _context.Accounts.Add(account);
+                    await InsertAccount(account);
                 }
                 else
                 {
                     savedAccount.Name = account.Name;
+                    await UpdateAccount(savedAccount);
                 }
             }
 
-            await _context.SaveChangesAsync();
+            return await GetAccounts();
+        }
 
-            return _context.Accounts;
+        private static async Task<IEnumerable<Transaction>> GetTransactionsWithoutPayees()
+        {
+            using var connection = GetConnection();
+
+            return await connection.QueryAsync<Transaction, Account, Transaction>("SELECT * FROM Transactions t INNER JOIN Accounts a ON t.AccountId = a.Id WHERE PayeeId IS NULL", 
+                (tx, account) =>
+                {
+                    tx.Account = account;
+
+                    return tx;
+                });
+        }
+
+        private static async Task UpdateTransactionPayee(int transactionId, int payeeId)
+        {
+            using var connection = GetConnection();
+
+            await connection.ExecuteAsync("UPDATE Transactions SET PayeeId = @payeeId WHERE Id = @transactionId",
+                new { payeeId, transactionId });
         }
 
         private static async Task AssignPayees()
         {
-            foreach (var tx in _context.Transactions.AsQueryable().Where(t => t.Payee == null))
+            foreach (var tx in await GetTransactionsWithoutPayees())
             {
-                var payee = await LookupPayee(tx.PayeeName);
+                var payeeId = await LookupPayeeId(tx.PayeeName);
 
-                if (payee == null)
+                if (payeeId == null)
                 {
-                    payee = await AskForPayee(tx.PayeeName);
+                    payeeId = await AskForPayeeId(tx.PayeeName, tx.Account.Name);
                 }
 
-                tx.Payee = payee;
+                await UpdateTransactionPayee(tx.Id, payeeId.Value);
             }
-
-            _context.SaveChanges();
         }
 
-        private static async Task<Payee> LookupPayee(string payeeName)
+        private static async Task<int?> LookupPayeeId(string payeeName)
         {
-            // First, alternate names
-            var payee = await _context.Payees.SingleOrDefaultAsync(p => p.AlternateNames.Contains(new PayeeAlternateName { Name = payeeName }, new AlternatePayeeNameComparer()));
+            using var connection = GetConnection();
 
-            return payee;
+            // First, alternate names
+            var payeeId = await connection.QueryFirstOrDefaultAsync<int?>("SELECT Id FROM Payees WHERE Name = @payeeName UNION SELECT PayeeId FROM PayeeAlternateNames WHERE Name = @payeeName",
+                new { payeeName });
+
+            return payeeId;
 
             // Second, machine learning
         }
 
-        private static async Task<Payee> AskForPayee(string payeeName)
+        private static async Task<int> InsertPayee(string name, string alternateName)
         {
-            Console.WriteLine("Payee name for: " + payeeName);
+            using var connection = GetConnection();
+
+            var payee = new Payee
+            {
+                Name = name
+            };
+
+            var payeeId = await connection.InsertAsync(payee);
+
+            await AddAlternatePayeeName(payeeId, alternateName);
+
+            return payeeId;
+        }
+        
+        private static async Task AddAlternatePayeeName(int payeeId, string name)
+        {
+            using var connection = GetConnection();
+
+            var alternateNameEntity = new PayeeAlternateName
+            {
+                Name = name,
+                PayeeId = payeeId,
+            };
+
+            await connection.InsertAsync(alternateNameEntity);
+        }
+
+        private static async Task<int> AskForPayeeId(string payeeName, string accountName)
+        {
+            Console.WriteLine($"Payee name for: {payeeName} (account {accountName})");
             Console.Write("> ");
 
             var newName = Console.ReadLine();
 
-            var payee = await LookupPayee(newName);
+            var payeeId = await LookupPayeeId(newName);
 
-            if (payee == null)
+            if (payeeId == null)
             {
-                payee = new Payee
-                {
-                    Name = newName,
-                    AlternateNames = new List<PayeeAlternateName> { new PayeeAlternateName { Name = payeeName } }
-                };
-
-                _context.Payees.Add(payee);
+                payeeId = await InsertPayee(newName, payeeName);
             }
             else
             {
-                payee.AlternateNames.Add(new PayeeAlternateName { Name = payeeName });
+                await AddAlternatePayeeName(payeeId.Value, payeeName);
             }
 
-            _context.SaveChanges();
-
-            return payee;
+            return payeeId.Value;
         }
 
         class AlternatePayeeNameComparer : IEqualityComparer<PayeeAlternateName>

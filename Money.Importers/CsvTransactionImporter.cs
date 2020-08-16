@@ -11,9 +11,9 @@ namespace Money.Importers
 {
     public class CsvTransactionImporter<T> : ITransactionImporter where T : IBankTransaction, new()
     {
-        private bool _hasHeaderRow = true;
-        private bool _skipFirstRow = false;
-        private bool _waitForEmptyLine = false;
+        private readonly bool _hasHeaderRow = true;
+        private readonly bool _skipFirstRow = false;
+        private readonly bool _waitForEmptyLine = false;
 
         public CsvTransactionImporter(bool hasHeaderRow = true, bool skipFirstRow = false, bool waitForEmptyLine = false)
         {

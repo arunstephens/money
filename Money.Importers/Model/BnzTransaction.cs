@@ -53,8 +53,6 @@ namespace Money.Importers.Model
             };
         }
 
-        private readonly static SHA256Managed sha = new SHA256Managed();
-
         private string GetExternalId()
         {
             var raw = $"{Date:yyyy-MM-dd}:{Serial}:{ProcessedDate:yyyy-MM-dd}:{Amount:0.00}";
