@@ -11,7 +11,5 @@ namespace Money.Data.Model
         public string Number { get; set; }
 
         public decimal OpeningBalance { get; set; }
-
-        public IList<Transaction> Transactions { get; set; }
     }
 }

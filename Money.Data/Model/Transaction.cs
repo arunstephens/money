@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper.Contrib.Extensions;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Money.Data.Model
@@ -8,6 +9,8 @@ namespace Money.Data.Model
         public int Id { get; set; }
         public string ExternalId { get; set; }
         public int AccountId { get; set; }
+        public int? PayeeId { get; set; }
+        [Computed]
         public Payee Payee { get; set; }
         //public int? CategoryId { get; set; }
 
@@ -30,6 +33,7 @@ namespace Money.Data.Model
 
         public string CardSuffix { get; set; }
 
+        [Computed]
         public virtual Account Account { get; set; }
     }
 }

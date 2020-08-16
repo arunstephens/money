@@ -20,33 +20,33 @@ namespace Money
         {
             Console.WriteLine("Arun's Money App");
 
-            //var accounts = await GetOrCreateAccounts();
+            var accounts = await GetOrCreateAccounts();
 
-            //Func<int, Func<string, Account>> accountGetter = accountId => _ => accounts.Single(a => a.Number == accountId.ToString());
+            Func<int, Func<string, Account>> accountGetter = accountId => _ => accounts.Single(a => a.Number == accountId.ToString());
 
-            //ITransactionImporter importer;
+            ITransactionImporter importer;
 
-            //importer = new CsvTransactionImporter<Importers.Model.BnzTransaction>(true, false);
+            importer = new CsvTransactionImporter<Importers.Model.BnzTransaction>(true, false);
 
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Joint---Main-9AUG2018-to-9AUG2020.csv", accountGetter(1)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Joint---Main-9AUG2018-to-9AUG2020.csv", accountGetter(1)));
 
-            //importer = new CsvTransactionImporter<Importers.Model.KiwibankCreditCardTransaction>(false, true);
+            importer = new CsvTransactionImporter<Importers.Model.KiwibankCreditCardTransaction>(false, true);
 
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\4833-48 - -3016_10Aug.CSV", accountGetter(2)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\4833-48 - -3016_10Aug.CSV", accountGetter(2)));
 
-            //importer = new CsvTransactionImporter<Importers.Model.KiwibankBankTransaction>(true, false);
+            importer = new CsvTransactionImporter<Importers.Model.KiwibankBankTransaction>(true, false);
 
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-02_10Aug.CSV", accountGetter(3)));
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-01_15Aug.CSV", accountGetter(4)));
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-03_15Aug.CSV", accountGetter(5)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-02_10Aug.CSV", accountGetter(3)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-01_15Aug.CSV", accountGetter(4)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-03_15Aug.CSV", accountGetter(5)));
 
-            //importer = new CsvTransactionImporter<Importers.Model.AsbBankTransaction>(false, false, true);
+            importer = new CsvTransactionImporter<Importers.Model.AsbBankTransaction>(false, false, true);
 
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213103.csv", accountGetter(6)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213103.csv", accountGetter(6)));
 
-            //importer = new CsvTransactionImporter<Importers.Model.AsbCreditCardTransaction>(false, false, true);
+            importer = new CsvTransactionImporter<Importers.Model.AsbCreditCardTransaction>(false, false, true);
 
-            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213632.csv", accountGetter(7)));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213632.csv", accountGetter(7)));
 
             await AssignPayees();
         }
@@ -68,7 +68,7 @@ namespace Money
         {
             using var connection = GetConnection();
 
-            return await connection.QueryFirstAsync<Transaction>("SELECT * FROM Transactions WHERE AccountId = @accountId AND ExternalId = @externalId",
+            return await connection.QueryFirstOrDefaultAsync<Transaction>("SELECT * FROM Transactions WHERE AccountId = @accountId AND ExternalId = @externalId",
                 new { accountId, externalId });
         }
 
@@ -83,7 +83,7 @@ namespace Money
         {
             await foreach (var tx in transactions)
             {
-                var savedTx = await GetTransaction(tx.Account.Id, tx.ExternalId);
+                var savedTx = await GetTransaction(tx.AccountId, tx.ExternalId);
 
                 if (savedTx != null)
                 {
@@ -105,7 +105,7 @@ namespace Money
         {
             using var connection = GetConnection();
 
-            return await connection.QueryFirstAsync<Account>("SELECCT * FROM Accounts WHERE Number = @accountNumber",
+            return await connection.QueryFirstOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE Number = @accountNumber",
                 new { accountNumber });
         }
 
