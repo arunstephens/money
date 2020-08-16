@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[PayeeAlternateName] (
+﻿CREATE TABLE [dbo].[PayeeAlternateNames] (
     [Id]      INT            IDENTITY (1, 1) NOT NULL,
     [Name]    NVARCHAR (MAX) NULL,
     [PayeeId] INT            NULL,
