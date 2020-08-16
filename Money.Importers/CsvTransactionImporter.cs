@@ -50,7 +50,7 @@ namespace Money.Importers
             {
                 var tx = bankTx.ToTransaction();
 
-                tx.AccountId = accountMapper(null).Id;
+                tx.Account = accountMapper(null);
 
                 yield return tx;
             }

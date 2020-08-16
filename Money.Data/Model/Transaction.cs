@@ -33,7 +33,16 @@ namespace Money.Data.Model
 
         public string CardSuffix { get; set; }
 
+        private Account _account;
+
         [Computed]
-        public virtual Account Account { get; set; }
+        public virtual Account Account
+        {
+            get => _account; set
+            {
+                _account = value;
+                AccountId = value.Id;
+            }
+        }
     }
 }

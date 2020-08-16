@@ -83,7 +83,7 @@ namespace Money
         {
             await foreach (var tx in transactions)
             {
-                var savedTx = await GetTransaction(tx.AccountId, tx.ExternalId);
+                var savedTx = await GetTransaction(tx.Account.Id, tx.ExternalId);
 
                 if (savedTx != null)
                 {
