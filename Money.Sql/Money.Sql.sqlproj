@@ -66,5 +66,6 @@
     <Build Include="dbo\Tables\PayeeAlternateNames.sql" />
     <Build Include="dbo\Tables\Transactions.sql" />
     <Build Include="dbo\Tables\Accounts.sql" />
+    <Build Include="dbo\Tables\Categories.sql" />
   </ItemGroup>
 </Project>

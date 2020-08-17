@@ -3,6 +3,7 @@
     [Name]           NVARCHAR (MAX)  NULL,
     [Number]         NVARCHAR (MAX)  NULL,
     [OpeningBalance] DECIMAL (18, 2) DEFAULT ((0.0)) NOT NULL,
+    [PocketSmithId] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_Accounts] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

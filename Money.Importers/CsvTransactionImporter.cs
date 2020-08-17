@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Money.Importers
 {
@@ -22,7 +23,7 @@ namespace Money.Importers
             _waitForEmptyLine = waitForEmptyLine;
         }
 
-        public async IAsyncEnumerable<Transaction> Import(string filename, Func<string, Account> accountMapper)
+        public async IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Account> accountMapper, Func<Category, Task<Category>> categoryMapper)
         {
             using var reader = new StreamReader(filename);
 
@@ -50,7 +51,19 @@ namespace Money.Importers
             {
                 var tx = bankTx.ToTransaction();
 
-                tx.Account = accountMapper(null);
+                if (accountMapper != null)
+                {
+                    var account = accountMapper(tx.Account);
+                    
+                    tx.Account = account;
+                }
+
+                if (categoryMapper != null)
+                {
+                    var category = await categoryMapper(tx.Category);
+
+                    tx.Category = category;
+                }
 
                 yield return tx;
             }

@@ -26,29 +26,51 @@ namespace Money
 
             ITransactionImporter importer;
 
-            importer = new CsvTransactionImporter<Importers.Model.BnzTransaction>(true, false);
+            //importer = new CsvTransactionImporter<Importers.Model.BnzTransaction>(true, false);
 
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Joint---Main-9AUG2018-to-9AUG2020.csv", accountGetter(1)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Joint---Main-9AUG2018-to-9AUG2020.csv", accountGetter(1)));
 
-            importer = new CsvTransactionImporter<Importers.Model.KiwibankCreditCardTransaction>(false, true);
+            //importer = new CsvTransactionImporter<Importers.Model.KiwibankCreditCardTransaction>(false, true);
 
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\4833-48 - -3016_10Aug.CSV", accountGetter(2)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\4833-48 - -3016_10Aug.CSV", accountGetter(2)));
 
-            importer = new CsvTransactionImporter<Importers.Model.KiwibankBankTransaction>(true, false);
+            //importer = new CsvTransactionImporter<Importers.Model.KiwibankBankTransaction>(true, false);
 
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-02_10Aug.CSV", accountGetter(3)));
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-01_15Aug.CSV", accountGetter(4)));
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-03_15Aug.CSV", accountGetter(5)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-02_10Aug.CSV", accountGetter(3)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-01_15Aug.CSV", accountGetter(4)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\38-9018-0371564-03_15Aug.CSV", accountGetter(5)));
 
-            importer = new CsvTransactionImporter<Importers.Model.AsbBankTransaction>(false, false, true);
+            //importer = new CsvTransactionImporter<Importers.Model.AsbBankTransaction>(false, false, true);
 
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213103.csv", accountGetter(6)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213103.csv", accountGetter(6)));
 
-            importer = new CsvTransactionImporter<Importers.Model.AsbCreditCardTransaction>(false, false, true);
+            //importer = new CsvTransactionImporter<Importers.Model.AsbCreditCardTransaction>(false, false, true);
 
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213632.csv", accountGetter(7)));
+            //await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\Export20200815213632.csv", accountGetter(7)));
 
-            await AssignPayees();
+            importer = new CsvTransactionImporter<Importers.Model.PocketSmithTransaction>(true, false, false);
+
+            await WriteTransactions(importer.Import(@"C:\Users\a\Documents\Money\pocketsmith-search.csv", a1 => accounts.FirstOrDefault(a2 => a1.PocketSmithId == a2.PocketSmithId),
+                GetCategory));
+
+            //await AssignPayees();
+        }
+
+        private async static Task<Category> GetCategory(Category category)
+        {
+            using var connection = GetConnection();
+
+            var fetchedCategory = await connection.QuerySingleOrDefaultAsync<Category>("SELECT * FROM Categories WHERE Name = @name", new { name = category.Name });
+
+            if (fetchedCategory != null)
+            {
+                return fetchedCategory;
+            }
+            else
+            {
+                connection.Insert(category);
+                return category;
+            }
         }
 
         private static SqlConnection GetConnection()
@@ -157,7 +179,7 @@ namespace Money
         {
             using var connection = GetConnection();
 
-            return await connection.QueryAsync<Transaction, Account, Transaction>("SELECT * FROM Transactions t INNER JOIN Accounts a ON t.AccountId = a.Id WHERE PayeeId IS NULL", 
+            return await connection.QueryAsync<Transaction, Account, Transaction>("SELECT * FROM Transactions t INNER JOIN Accounts a ON t.AccountId = a.Id WHERE PayeeId IS NULL",
                 (tx, account) =>
                 {
                     tx.Account = account;
@@ -217,7 +239,7 @@ namespace Money
 
             return payeeId;
         }
-        
+
         private static async Task AddAlternatePayeeName(int payeeId, string name)
         {
             using var connection = GetConnection();

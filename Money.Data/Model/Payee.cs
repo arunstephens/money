@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper.Contrib.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,9 @@ namespace Money.Data.Model
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        [Computed]
+        public ICollection<PayeeAlternateName> AlternateNames { get; set; }
     }
 
     public class PayeeAlternateName

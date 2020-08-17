@@ -12,7 +12,7 @@ namespace Money.Data.Model
         public int? PayeeId { get; set; }
         [Computed]
         public Payee Payee { get; set; }
-        //public int? CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         public DateTime TransactionDate { get; set; }
         public DateTime? ProcessedDate { get; set; }
@@ -34,14 +34,27 @@ namespace Money.Data.Model
         public string CardSuffix { get; set; }
 
         private Account _account;
+        private Category _category;
 
         [Computed]
         public virtual Account Account
         {
-            get => _account; set
+            get => _account;
+            set
             {
                 _account = value;
                 AccountId = value.Id;
+            }
+        }
+
+        [Computed]
+        public virtual Category Category
+        {
+            get => _category;
+            set
+            {
+                _category = value;
+                CategoryId = value?.Id;
             }
         }
     }
