@@ -113,9 +113,9 @@ namespace Money
                 {
                     // This query is wrong and I feel sad
 
-                    var tagId = await connection.ExecuteScalarAsync("IF NOT EXISTS (SELECT Id FROM Tags WHERE [Name] = @name) " +
-                        "ELSE INSERT INTO Tags ([Name]) VALUES (@name); SELECT SCOPE_IDENTITY() AS Id",
-                        new { name = tag }, transaction);
+                    var tagId = await connection.ExecuteScalarAsync("DECLARE @Id INT; SELECT @Id = Id FROM Tags WHERE [Name] = @name;" +
+                        "IF @Id IS NOT NULL BEGIN SELECT @Id END ELSE BEGIN INSERT INTO Tags ([Name]) VALUES (@name); SELECT SCOPE_IDENTITY() AS Id END",
+                        new { name = tag }, transaction); 
 
                     await connection.ExecuteAsync("INSERT INTO TransactionsTags (TransactionId, TagId) VALUES (@transactionId, @tagId)",
                         new { transactionId = tx.Id, tagId }, transaction);
