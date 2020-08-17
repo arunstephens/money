@@ -50,7 +50,7 @@ namespace Money
 
             importer = new CsvTransactionImporter<Importers.Model.PocketSmithTransaction>(true, false, false);
 
-            await WriteTransactions(importer.Import(@"C:\Users\a\Documents\Money\pocketsmith-search.csv", a1 => accounts.FirstOrDefault(a2 => a1.PocketSmithId == a2.PocketSmithId),
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\pocketsmith-search.csv", a1 => accounts.FirstOrDefault(a2 => a1.PocketSmithId == a2.PocketSmithId),
                 GetCategory));
 
             //await AssignPayees();
@@ -98,7 +98,31 @@ namespace Money
         {
             using var connection = GetConnection();
 
-            await connection.InsertAsync(tx);
+            connection.Open();
+
+            var transaction = await connection.BeginTransactionAsync();
+
+            await connection.InsertAsync(tx, transaction);
+
+            await connection.ExecuteAsync("DELETE FROM TransactionsTags WHERE TransactionId = @transactionId",
+                new { transactionId = tx.Id }, transaction);
+
+            if (tx.Tags != null)
+            {
+                foreach (var tag in tx.Tags)
+                {
+                    // This query is wrong and I feel sad
+
+                    var tagId = await connection.ExecuteScalarAsync("IF NOT EXISTS (SELECT Id FROM Tags WHERE [Name] = @name) " +
+                        "ELSE INSERT INTO Tags ([Name]) VALUES (@name); SELECT SCOPE_IDENTITY() AS Id",
+                        new { name = tag }, transaction);
+
+                    await connection.ExecuteAsync("INSERT INTO TransactionsTags (TransactionId, TagId) VALUES (@transactionId, @tagId)",
+                        new { transactionId = tx.Id, tagId }, transaction);
+                }
+            }
+
+            transaction.Commit();
         }
 
         private static async Task InsertOrUpdateTransactions(IAsyncEnumerable<Transaction> transactions)

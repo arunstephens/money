@@ -47,7 +47,8 @@ namespace Money.Importers.Model
                 Reference = Memo,
                 Particulars = Note,
                 Category = new Category { Name = Category },
-                ExternalId = ModelHelper.GetSignature(ID)
+                ExternalId = ModelHelper.GetSignature(ID),
+                Tags = Labels?.Split(",")
             };
         }
     }

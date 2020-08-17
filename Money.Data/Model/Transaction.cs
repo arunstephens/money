@@ -1,5 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Money.Data.Model
@@ -57,5 +58,8 @@ namespace Money.Data.Model
                 CategoryId = value?.Id;
             }
         }
+
+        [Computed]
+        public IEnumerable<string> Tags { get; set; }
     }
 }
