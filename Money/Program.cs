@@ -85,9 +85,15 @@ namespace Money
             {
                 payeeId = await LookupPayeeId(originalName);
             }
+
             if (payeeId == null)
             {
                 payeeId = await LookupPayeeId(payee.Name);
+
+                if (payeeId != null && originalName != null)
+                {
+                    await AddAlternatePayeeName(payeeId.Value, originalName);
+                }
             }
 
             if (payeeId == null)
@@ -282,13 +288,21 @@ namespace Money
 
             var payeeId = await connection.InsertAsync(payee);
 
-            await AddAlternatePayeeName(payeeId, alternateName);
+            if (alternateName != null)
+            {
+                await AddAlternatePayeeName(payeeId, alternateName);
+            }
 
             return payeeId;
         }
 
         private static async Task AddAlternatePayeeName(int payeeId, string name)
         {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            
             using var connection = GetConnection();
 
             var alternateNameEntity = new PayeeAlternateName
