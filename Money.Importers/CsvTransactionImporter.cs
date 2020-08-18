@@ -23,7 +23,7 @@ namespace Money.Importers
             _waitForEmptyLine = waitForEmptyLine;
         }
 
-        public async IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Account> accountMapper, Func<Category, Task<Category>> categoryMapper)
+        public async IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Task<Account>> accountMapper, Func<Category, Task<Category>> categoryMapper, Func<Payee, Task<Payee>> payeeMapper)
         {
             using var reader = new StreamReader(filename);
 
@@ -39,6 +39,7 @@ namespace Money.Importers
             using var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture);
 
             csv.Configuration.HasHeaderRecord = _hasHeaderRow;
+            csv.Configuration.TrimOptions = TrimOptions.Trim;
 
             if (_skipFirstRow)
             {
@@ -53,8 +54,8 @@ namespace Money.Importers
 
                 if (accountMapper != null)
                 {
-                    var account = accountMapper(tx.Account);
-                    
+                    var account = await accountMapper(tx.Account);
+
                     tx.Account = account;
                 }
 
@@ -63,6 +64,13 @@ namespace Money.Importers
                     var category = await categoryMapper(tx.Category);
 
                     tx.Category = category;
+                }
+
+                if (payeeMapper != null)
+                {
+                    var payee = await payeeMapper(tx.Payee);
+
+                    tx.Payee = payee;
                 }
 
                 yield return tx;

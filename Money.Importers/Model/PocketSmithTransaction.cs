@@ -33,22 +33,30 @@ namespace Money.Importers.Model
 
         public Transaction ToTransaction()
         {
+            Payee payee = null;
+
+            if (Merchant.EmptyToNull() != OriginalMerchant.EmptyToNull() && Merchant.EmptyToNull() != null)
+            {
+                // The payee should be mapped on import
+                payee = new Payee
+                {
+                    Name = Merchant.EmptyToNull(),
+                    AlternateNames = new List<PayeeAlternateName> { new PayeeAlternateName { Name = OriginalMerchant.EmptyToNull() } }
+                };
+            }
+
             return new Transaction
             {
                 TransactionDate = Date,
-                PayeeName = Merchant,
-                Payee = Merchant != OriginalMerchant ? new Payee
-                {
-                    Name = Merchant,
-                    AlternateNames = new List<PayeeAlternateName> { new PayeeAlternateName { Name = OriginalMerchant } }
-                } : null,
-                Account = new Account { PocketSmithId = Account },
+                PayeeName = Merchant.EmptyToNull(),
+                Payee = payee,
+                Account = new Account { PocketSmithId = Account.EmptyToNull() },
                 Amount = Amount,
-                Reference = Memo,
-                Particulars = Note,
-                Category = new Category { Name = Category },
+                Reference = Memo.EmptyToNull(),
+                Particulars = Note.EmptyToNull(),
+                Category = new Category { Name = Category.EmptyToNull() },
                 ExternalId = ModelHelper.GetSignature(ID),
-                Tags = Labels?.Split(",")
+                Tags = Labels.EmptyToNull()?.Split(",")
             };
         }
     }

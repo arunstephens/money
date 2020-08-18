@@ -16,5 +16,15 @@ namespace Money.Importers.Model
             var signatureString = Convert.ToBase64String(signature);
             return signatureString;
         }
+
+        internal static string EmptyToNull(this string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                return null;
+            }
+
+            return s;
+        }
     }
 }

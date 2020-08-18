@@ -8,6 +8,6 @@ namespace Money.Importers
 {
     public interface ITransactionImporter
     {
-        IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Account> accountMapper, Func<Category, Task<Category>> categoryMapper);
+        IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Task<Account>> accountMapper, Func<Category, Task<Category>> categoryMapper, Func<Payee, Task<Payee>> payeeMapper);
     }
 }

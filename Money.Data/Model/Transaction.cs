@@ -11,8 +11,20 @@ namespace Money.Data.Model
         public string ExternalId { get; set; }
         public int AccountId { get; set; }
         public int? PayeeId { get; set; }
+
+        private Payee _payee;
+
         [Computed]
-        public Payee Payee { get; set; }
+        public Payee Payee
+        {
+            get => _payee;
+            set
+            {
+                PayeeId = value.Id;
+                _payee = value;
+            }
+        }
+
         public int? CategoryId { get; set; }
 
         public DateTime TransactionDate { get; set; }

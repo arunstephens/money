@@ -50,8 +50,8 @@ namespace Money
 
             importer = new CsvTransactionImporter<Importers.Model.PocketSmithTransaction>(true, false, false);
 
-            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\pocketsmith-search.csv", a1 => accounts.FirstOrDefault(a2 => a1.PocketSmithId == a2.PocketSmithId),
-                GetCategory));
+            await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\pocketsmith-search.csv", a1 => Task.FromResult(accounts.FirstOrDefault(a2 => a1.PocketSmithId == a2.PocketSmithId)),
+                GetCategory, GetPayee));
 
             //await AssignPayees();
         }
@@ -71,6 +71,31 @@ namespace Money
                 connection.Insert(category);
                 return category;
             }
+        }
+
+        private async static Task<Payee> GetPayee(Payee payee)
+        {
+            using var connection = GetConnection();
+
+            var originalName = payee.AlternateNames.FirstOrDefault().Name;
+
+            int? payeeId = null;
+
+            if (originalName != null)
+            {
+                payeeId = await LookupPayeeId(originalName);
+            }
+            if (payeeId == null)
+            {
+                payeeId = await LookupPayeeId(payee.Name);
+            }
+
+            if (payeeId == null)
+            {
+                payeeId = await InsertPayee(payee.Name, originalName);
+            }
+
+            return await connection.GetAsync<Payee>(payeeId.Value);
         }
 
         private static SqlConnection GetConnection()
@@ -111,11 +136,9 @@ namespace Money
             {
                 foreach (var tag in tx.Tags)
                 {
-                    // This query is wrong and I feel sad
-
                     var tagId = await connection.ExecuteScalarAsync("DECLARE @Id INT; SELECT @Id = Id FROM Tags WHERE [Name] = @name;" +
                         "IF @Id IS NOT NULL BEGIN SELECT @Id END ELSE BEGIN INSERT INTO Tags ([Name]) VALUES (@name); SELECT SCOPE_IDENTITY() AS Id END",
-                        new { name = tag }, transaction); 
+                        new { name = tag }, transaction);
 
                     await connection.ExecuteAsync("INSERT INTO TransactionsTags (TransactionId, TagId) VALUES (@transactionId, @tagId)",
                         new { transactionId = tx.Id, tagId }, transaction);
