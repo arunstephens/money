@@ -59,13 +59,10 @@ namespace Money.Importers
                     var account = await accountMapper(tx.Account);
 
                     tx.Account = account;
-                }
 
-                if (categoryMapper != null)
-                {
-                    var category = await categoryMapper(tx.Category);
+                    account = await accountMapper(tx.OtherAccount);
 
-                    tx.Category = category;
+                    tx.OtherAccount = account;
                 }
 
                 if (payeeMapper != null)

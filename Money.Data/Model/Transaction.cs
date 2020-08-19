@@ -10,6 +10,7 @@ namespace Money.Data.Model
         public int Id { get; set; }
         public string ExternalId { get; set; }
         public int AccountId { get; set; }
+        public int? OtherAccountId { get; set; }
         public int? PayeeId { get; set; }
 
         private Payee _payee;
@@ -47,6 +48,7 @@ namespace Money.Data.Model
         public string CardSuffix { get; set; }
 
         private Account _account;
+        private Account _otherAccount;
         private Category _category;
 
         [Computed]
@@ -57,6 +59,17 @@ namespace Money.Data.Model
             {
                 _account = value;
                 AccountId = value.Id;
+            }
+        }
+
+        [Computed]
+        public virtual Account OtherAccount
+        {
+            get => _otherAccount;
+            set
+            {
+                _otherAccount = value;
+                OtherAccountId = value?.Id;
             }
         }
 
