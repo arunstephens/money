@@ -2,6 +2,7 @@
 using Money.Data.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Money.Importers.Model
@@ -56,7 +57,7 @@ namespace Money.Importers.Model
                 Particulars = Note.EmptyToNull(),
                 Category = new Category { Name = Category.EmptyToNull() },
                 ExternalId = ModelHelper.GetSignature(ID),
-                Tags = Labels.EmptyToNull()?.Split(",")
+                Tags = Labels?.Split(",").Where(t => t.EmptyToNull() != null)
             };
         }
     }
