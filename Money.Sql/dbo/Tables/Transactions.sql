@@ -18,13 +18,11 @@
     [OriginatingBankBranch]   NVARCHAR (MAX)  NULL,
     [CardSuffix]              NVARCHAR (MAX)  NULL,
     [PayeeId]                 INT             NULL,
-    [CategoryId]              INT             NULL,
     [DataSource]              NVARCHAR (MAX)  NULL,
     [OtherAccountId] INT NULL, 
     CONSTRAINT [PK_Transactions] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Transactions_Accounts_AccountId] FOREIGN KEY ([AccountId]) REFERENCES [dbo].[Accounts] ([Id]),
     CONSTRAINT [FK_Transactions_Payees_PayeeId] FOREIGN KEY ([PayeeId]) REFERENCES [dbo].[Payees] ([Id]),
-    CONSTRAINT [FK_Transactions_Categories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [dbo].[Categories] ([Id]),
     CONSTRAINT [FK_Transactions_Accounts_OtherAccountId] FOREIGN KEY ([AccountId]) REFERENCES [dbo].[Accounts] ([Id])
 );
 
