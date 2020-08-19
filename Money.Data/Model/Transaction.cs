@@ -73,5 +73,7 @@ namespace Money.Data.Model
 
         [Computed]
         public IEnumerable<string> Tags { get; set; }
+        
+        public string DataSource { get; set; }
     }
 }

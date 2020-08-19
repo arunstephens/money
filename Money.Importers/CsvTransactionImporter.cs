@@ -25,6 +25,8 @@ namespace Money.Importers
 
         public async IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Task<Account>> accountMapper, Func<Category, Task<Category>> categoryMapper, Func<Payee, Task<Payee>> payeeMapper)
         {
+            var dataSourceName = GetType().FullName;
+
             using var reader = new StreamReader(filename);
 
             if (_waitForEmptyLine)
@@ -72,6 +74,8 @@ namespace Money.Importers
 
                     tx.Payee = payee;
                 }
+
+                tx.DataSource = dataSourceName;
 
                 yield return tx;
             }
