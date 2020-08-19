@@ -49,7 +49,6 @@ namespace Money.Data.Model
 
         private Account _account;
         private Account _otherAccount;
-        private Category _category;
 
         [Computed]
         public virtual Account Account
@@ -70,17 +69,6 @@ namespace Money.Data.Model
             {
                 _otherAccount = value;
                 OtherAccountId = value?.Id;
-            }
-        }
-
-        [Computed]
-        public virtual Category Category
-        {
-            get => _category;
-            set
-            {
-                _category = value;
-                CategoryId = value?.Id;
             }
         }
 

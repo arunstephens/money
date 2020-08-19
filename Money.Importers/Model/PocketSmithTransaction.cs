@@ -55,7 +55,11 @@ namespace Money.Importers.Model
                 Amount = Amount,
                 Reference = Memo.EmptyToNull(),
                 Particulars = Note.EmptyToNull(),
-                OtherAccount = new Account { Name = Category.EmptyToNull() },
+                OtherAccount = new Account
+                {
+                    Name = Category.EmptyToNull(),
+                    AccountType = new AccountType { Code = "EXPENSE" }
+                },
                 ExternalId = ModelHelper.GetSignature(ID),
                 Tags = Labels?.Split(",").Where(t => t.EmptyToNull() != null)
             };

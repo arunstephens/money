@@ -51,7 +51,7 @@ namespace Money
             importer = new CsvTransactionImporter<Importers.Model.PocketSmithTransaction>(true, false, false);
 
             await InsertOrUpdateTransactions(importer.Import(@"C:\Users\a\Documents\Money\pocketsmith-search.csv", GetAccountForPocketSmithImport,
-                GetCategory, GetPayee));
+                GetPayee));
 
             //await AssignPayees();
         }
@@ -106,23 +106,6 @@ namespace Money
             }
 
             return result;
-        }
-
-        private async static Task<Category> GetCategory(Category category)
-        {
-            using var connection = GetConnection();
-
-            var fetchedCategory = await connection.QuerySingleOrDefaultAsync<Category>("SELECT * FROM Categories WHERE Name = @name", new { name = category.Name });
-
-            if (fetchedCategory != null)
-            {
-                return fetchedCategory;
-            }
-            else
-            {
-                connection.Insert(category);
-                return category;
-            }
         }
 
         private async static Task<Payee> GetPayee(Payee payee)
@@ -242,7 +225,7 @@ namespace Money
 
             if (account.AccountType != null)
             {
-                var accountType = connection.QueryFirstOrDefault<AccountType>("SELECT * FROM AccountTypes WHERE Code == @code",
+                var accountType = connection.QueryFirstOrDefault<AccountType>("SELECT * FROM AccountTypes WHERE Code = @code",
                     new { code = account.AccountType.Code });
 
                 if (accountType != null)

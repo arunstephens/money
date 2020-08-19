@@ -23,7 +23,7 @@ namespace Money.Importers
             _waitForEmptyLine = waitForEmptyLine;
         }
 
-        public async IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Task<Account>> accountMapper, Func<Category, Task<Category>> categoryMapper, Func<Payee, Task<Payee>> payeeMapper)
+        public async IAsyncEnumerable<Transaction> Import(string filename, Func<Account, Task<Account>> accountMapper, Func<Payee, Task<Payee>> payeeMapper)
         {
             var dataSourceName = GetType().FullName;
 
@@ -60,10 +60,12 @@ namespace Money.Importers
 
                     tx.Account = account;
 
-                    account = await accountMapper(tx.OtherAccount);
-                    account.AccountType = new AccountType { Code = "EXPENSE" };
+                    if (tx.OtherAccount != null)
+                    {
+                        account = await accountMapper(tx.OtherAccount);
 
-                    tx.OtherAccount = account;
+                        tx.OtherAccount = account;
+                    }
                 }
 
                 if (payeeMapper != null)
