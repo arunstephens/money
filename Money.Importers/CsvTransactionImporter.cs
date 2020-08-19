@@ -61,6 +61,7 @@ namespace Money.Importers
                     tx.Account = account;
 
                     account = await accountMapper(tx.OtherAccount);
+                    account.AccountType = new AccountType { Code = "EXPENSE" };
 
                     tx.OtherAccount = account;
                 }

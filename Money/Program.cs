@@ -56,6 +56,8 @@ namespace Money
             //await AssignPayees();
         }
 
+        private static List<Account> _accountCache = new List<Account>();
+
         private async static Task<Account> GetAccountForPocketSmithImport(Account account)
         {
             using var connection = GetConnection();
@@ -64,14 +66,34 @@ namespace Money
 
             if (account.PocketSmithId != null)
             {
-                result = await connection.QuerySingleOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE PocketSmithId = @pocketSmithId",
-                    new { pocketSmithId = account.PocketSmithId });
+                result = _accountCache.SingleOrDefault(a => a.PocketSmithId == account.PocketSmithId);
+
+                if (result == null)
+                {
+                    result = await connection.QuerySingleOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE PocketSmithId = @pocketSmithId",
+                        new { pocketSmithId = account.PocketSmithId });
+
+                    if (result != null)
+                    {
+                        _accountCache.Add(result);
+                    }
+                }
             }
 
             if (result == null)
             {
-                result = await connection.QuerySingleOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE Name = @name",
-                    new { name = account.Name });
+                result = _accountCache.SingleOrDefault(a => a.Name == account.Name);
+
+                if (result == null)
+                {
+                    result = await connection.QuerySingleOrDefaultAsync<Account>("SELECT * FROM Accounts WHERE Name = @name",
+                        new { name = account.Name });
+
+                    if (result != null)
+                    {
+                        _accountCache.Add(result);
+                    }
+                }
             }
 
             if (result == null)
@@ -79,6 +101,8 @@ namespace Money
                 await InsertAccount(account);
 
                 result = account;
+
+                _accountCache.Add(result);
             }
 
             return result;
@@ -216,6 +240,17 @@ namespace Money
         {
             using var connection = GetConnection();
 
+            if (account.AccountType != null)
+            {
+                var accountType = connection.QueryFirstOrDefault<AccountType>("SELECT * FROM AccountTypes WHERE Code == @code",
+                    new { code = account.AccountType.Code });
+
+                if (accountType != null)
+                {
+                    account.AccountType = accountType;
+                }
+            }
+
             await connection.InsertAsync(account);
         }
 
@@ -330,7 +365,7 @@ namespace Money
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            
+
             using var connection = GetConnection();
 
             var alternateNameEntity = new PayeeAlternateName
