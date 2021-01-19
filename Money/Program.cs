@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Dapper.Contrib.Extensions;
 using Money.Data;
-using Money.Data.Model;
+using Money.Core.Models;
 using Money.Importers;
 using System;
 using System.Collections.Generic;

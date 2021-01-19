@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Money.Importers", "Money.Im
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Money.Sql", "Money.Sql\Money.Sql.sqlproj", "{7C882B79-44C7-4E34-8435-DB85EE3CF16E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Web", "Money.Web\Money.Web.csproj", "{8297D1F2-5559-4450-B9F6-0E8C2649A386}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Core", "Money.Core\Money.Core.csproj", "{AFD58C80-4180-4B64-9DBE-6BF9EC77BB79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,14 @@ Global
 		{7C882B79-44C7-4E34-8435-DB85EE3CF16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C882B79-44C7-4E34-8435-DB85EE3CF16E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7C882B79-44C7-4E34-8435-DB85EE3CF16E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8297D1F2-5559-4450-B9F6-0E8C2649A386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8297D1F2-5559-4450-B9F6-0E8C2649A386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8297D1F2-5559-4450-B9F6-0E8C2649A386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8297D1F2-5559-4450-B9F6-0E8C2649A386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFD58C80-4180-4B64-9DBE-6BF9EC77BB79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFD58C80-4180-4B64-9DBE-6BF9EC77BB79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFD58C80-4180-4B64-9DBE-6BF9EC77BB79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFD58C80-4180-4B64-9DBE-6BF9EC77BB79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

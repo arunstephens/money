@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Money.Data.Model
+namespace Money.Core.Models
 {
     public class Account
     {

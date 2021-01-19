@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration;
-using Money.Data.Model;
+using Money.Core.Models;
 using Money.Importers.Model;
 using System;
 using System.Collections.Generic;

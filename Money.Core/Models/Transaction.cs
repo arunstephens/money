@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Money.Data.Model
+namespace Money.Core.Models
 {
     public class Transaction
     {
@@ -25,8 +25,6 @@ namespace Money.Data.Model
                 _payee = value;
             }
         }
-
-        public int? CategoryId { get; set; }
 
         public DateTime TransactionDate { get; set; }
         public DateTime? ProcessedDate { get; set; }

@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Money.Data.Model
+namespace Money.Core.Models
 {
-    public class Tag
+    public class AccountType
     {
         public int Id { get; set; }
         public string Name { get; set; }
-
-        public IList<Transaction> Transactions { get; set; }
+        public string Code { get; set; }
     }
 }
